@@ -443,10 +443,11 @@
                 ex.note
               }</textarea>
 
-              <button class="copy-btn" onclick="copyToClipboard(\`${ex.code.replace(
-                /`/g,
-                '\\`'
-              )}\`)">คัดลอก</button>
+              <div style="display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap;">
+  <button class="copy-btn" onclick="copyToClipboard(\`${ex.code.replace(/`/g, '\\`')}\`)">คัดลอก</button>
+  <button class="danger" onclick="deleteExample(${selectedIndex}, ${i})">ลบตัวอย่าง</button>
+</div>
+
               
               <pre><code class="language-c" id="preview-${i}">${
                 ex.code
