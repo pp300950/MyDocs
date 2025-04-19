@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>C Command Library</title>
+  <link href="https://cdn.jsdelivr.net/npm/prismjs/themes/prism-tomorrow.css" rel="stylesheet" />
+  <style>
+    body {
+  background: url('https://i.imgur.com/fdEqqml.png') repeat;
+  background-size: cover;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(40, 40, 40, 0.6);
+  z-index: -1;
+}
+
+textarea.code-preview {
+  background: #111;
+  color: #0f0;
+  font-family: monospace;
+  padding: 0.75rem;
+  border-radius: 6px;
+  margin-top: 10px;
+  border: 1px solid #333;
+  white-space: pre-wrap;
+  overflow-x: auto;
+}
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #1e1e1e;
+      color: white;
+    }
+    .container {
+      display: flex;
+      height: 100vh;
+    }
+    .sidebar {
+      width: 30%;
+      background: #2e2e2e;
+      padding: 1rem;
+      overflow-y: auto;
+      border-right: 1px solid #444;
+    }
+    .content {
+      width: 70%;
+      padding: 1rem;
+      overflow-y: auto;
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 0.5rem;
+      margin-bottom: 10px;
+      background: #2a2a2a;
+      border: 1px solid #555;
+      color: white;
+      border-radius: 5px;
+      resize: vertical;
+    }
+    textarea {
+      min-height: 100px;
+      overflow-y: auto;
+      white-space: pre;
+    }
+    button {
+      padding: 0.5rem 1rem;
+      margin-right: 5px;
+      border: none;
+      background: #4caf50;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button.danger {
+      background: #f44336;
+    }
+    .command-item {
+      background: #3a3a3a;
+      padding: 10px;
+      margin-bottom: 5px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .command-item:hover {
+      background: #555;
+    }
+    .example-block {
+      background: #2d2d2d;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+    }
+    pre {
+      background: #1e1e1e;
+      padding: 1rem;
+      border-radius: 6px;
+      overflow-x: auto;
+    }
+    h2, h3 {
+      margin-top: 0;
+    }
+    .top-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 1rem;
+    }
+    .copy-btn {
+      background: #2196f3;
+      float: right;
+    }
+    .settings {
+      padding: 1rem;
+      border-bottom: 1px solid #444;
+    }
+  </style>
+</head>
+<body>
+  <div class="settings">
+    <label>Font Family:
+      <select id="fontSelect" onchange="updateFont()">
+        <option value="'Segoe UI', sans-serif">Segoe UI</option>
+        <option value="monospace">Monospace</option>
+        <option value="Arial, sans-serif">Arial</option>
+        <option value="Courier New, monospace">Courier New</option>
+      </select>
+    </label>
+    <label>Font Size:
+      <select id="fontSizeSelect" onchange="updateFont()">
+        <option value="14px">14px</option>
+        <option value="16px" selected>16px</option>
+        <option value="18px">18px</option>
+        <option value="20px">20px</option>
+      </select>
+    </label>
+  </div>
+  <div class="container">
+    <div class="sidebar">
+      <div class="top-bar">
+        <input type="text" id="search" placeholder="Search..." />
+        <button onclick="addCommand()">＋</button>
+      </div>
+      <div id="command-list"></div>
+    </div>
+    <div class="content" id="details">
+      <h2>Select a command</h2>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/prismjs/prism.js"></script>
+  <script>
+    let commands = JSON.parse(localStorage.getItem('c_commands') || '[]');
+    let selectedIndex = null;
+
+    function save() {
+      localStorage.setItem('c_commands', JSON.stringify(commands));
+    }
+
+    function renderList() {
+      const keyword = document.getElementById('search').value.toLowerCase();
+      const listEl = document.getElementById('command-list');
+      listEl.innerHTML = '';
+      commands
+        .filter(cmd => cmd.name.toLowerCase().includes(keyword) || cmd.description.toLowerCase().includes(keyword))
+        .forEach((cmd, idx) => {
+          const div = document.createElement('div');
+          div.className = 'command-item';
+          div.innerText = cmd.name;
+          div.onclick = () => selectCommand(idx);
+          listEl.appendChild(div);
+        });
+    }
+
+    function renderDetails() {
+      const container = document.getElementById('details');
+      if (selectedIndex === null) {
+        container.innerHTML = '<h2>Select a command</h2>';
+        return;
+      }
+
+      const cmd = commands[selectedIndex];
+      container.innerHTML = `
+        <h2 contenteditable onblur="editField(${selectedIndex}, 'name', this.innerText)">${cmd.name}</h2>
+        <textarea placeholder="Description..." oninput="editField(${selectedIndex}, 'description', this.value)">${cmd.description}</textarea>
+        <h3>Examples:</h3>
+        <div id="examples">
+          ${cmd.examples.map((ex, i) => `
+            <div class="example-block">
+              <textarea placeholder="Code example..." oninput="editExample(${selectedIndex}, ${i}, 'code', this.value)" oninput="autoGrow(this)">${ex.code}</textarea>
+              <input placeholder="Explanation..." value="${ex.note}" oninput="editExample(${selectedIndex}, ${i}, 'note', this.value)" />
+              <button class="copy-btn" onclick="copyToClipboard(\`${ex.code.replace(/`/g, '\`')}\`)">Copy</button>
+              <pre><code class="language-c">${ex.code}</code></pre>
+              <button class="danger" onclick="deleteExample(${selectedIndex}, ${i})">Delete Example</button>
+            </div>
+          `).join('')}
+        </div>
+        <button onclick="addExample(${selectedIndex})">+ Add Example</button>
+        <button class="danger" onclick="deleteCommand(${selectedIndex})" style="float:right">Delete Command</button>
+      `;
+
+      Prism.highlightAll();
+    }
+
+    function addCommand() {
+      commands.push({ name: 'คำสั่งใหม่', description: '', examples: [] });
+      save();
+      selectedIndex = commands.length - 1;
+      renderList();
+      renderDetails();
+    }
+
+    function deleteCommand(idx) {
+      if (confirm('Delete this command?')) {
+        commands.splice(idx, 1);
+        selectedIndex = null;
+        save();
+        renderList();
+        renderDetails();
+      }
+    }
+
+    function editField(idx, field, value) {
+      commands[idx][field] = value;
+      save();
+      if (field === 'name') renderList();
+    }
+
+    function addExample(index) {
+      commands[index].examples.push({ code: '', note: '' });
+      save();
+      renderDetails();
+    }
+
+    function editExample(cmdIdx, exIdx, field, value) {
+      commands[cmdIdx].examples[exIdx][field] = value;
+      save();
+    }
+
+    function deleteExample(cmdIdx, exIdx) {
+      commands[cmdIdx].examples.splice(exIdx, 1);
+      save();
+      renderDetails();
+    }
+
+    function selectCommand(idx) {
+      selectedIndex = idx;
+      renderDetails();
+    }
+
+    function updateFont() {
+      const font = document.getElementById('fontSelect').value;
+      const size = document.getElementById('fontSizeSelect').value;
+      document.body.style.fontFamily = font;
+      document.body.style.fontSize = size;
+    }
+
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => alert('Copied!'));
+    }
+
+    function autoGrow(element) {
+      element.style.height = 'auto';
+      element.style.height = (element.scrollHeight) + 'px';
+    }
+
+    document.getElementById('search').addEventListener('input', renderList);
+
+    renderList();
+    renderDetails();
+  </script>
+</body>
+</html>
