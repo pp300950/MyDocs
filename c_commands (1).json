@@ -1,0 +1,96 @@
+[
+  {
+    "name": "scanf(\"%d\", &number);",
+    "description": "คำสั่งรับค่าป้อนเข้ามา เเละตัดคำเมื่อเจอเว้นวรรค \n\n",
+    "examples": [
+      {
+        "code": "printf(\"ป้อนจำนวนเต็ม: \");\nscanf(\"%d\", &number);",
+        "note": "สำหรับเลขจำนวนเต็ม"
+      },
+      {
+        "code": "printf(\"ป้อนเลขทศนิยม: \");\nscanf(\"%f\", &decimal);",
+        "note": "สำหรับเลขทศนิยม"
+      },
+      {
+        "code": "// ลบ \\n สำหรับคำสั่ง scanf เท่านั้น\ngetchar();",
+        "note": "เจ้าตัว คำสั่งนี้เวลากด Enter มันจะเก็บ \\n มาด้วย\nใช้คำสั่งนี้เพื่อลบมัน"
+      }
+    ]
+  },
+  {
+    "name": "Open template",
+    "description": "รวมคำสั่งเปิด",
+    "examples": [
+      {
+        "code": "#include <stdio.h>     // พิมพ์ข้อความ, รับค่าจากผู้ใช้\n#include <stdlib.h>    // ฟังก์ชันช่วยทั่วไป เช่น malloc, exit\n#include <string.h>    // จัดการสตริง\n#include <math.h>      // คณิตศาสตร์ เช่น pow(), sqrt()\n#include <ctype.h>     // ตรวจสอบ/แปลงอักขระ\n#include <stdbool.h>   // ใช้ true/false\n#include <time.h>      // จัดการเวลา เช่น time(), delay\n\nint main() {\n    // ตัวแปรพื้นฐาน\n    int num = 0;\n    float decimal = 0.0;\n    char text[100];\n    bool isRunning = true;\n\n    // แสดงข้อความทักทาย\n    printf(\"ยินดีต้อนรับเข้าสู่โปรแกรม!\\n\");\n\n    // รับอินพุตตัวเลข\n    printf(\"กรุณาใส่เลขจำนวนเต็ม: \");\n    scanf(\"%d\", &num);\n\n    // รับเลขทศนิยม\n    printf(\"กรุณาใส่เลขทศนิยม: \");\n    scanf(\"%f\", &decimal);\n\n    // ล้าง buffer\n    getchar();\n\n    // รับสตริง\n    printf(\"กรุณาใส่ข้อความ: \");\n    fgets(text, sizeof(text), stdin);\n\n    // แสดงผล\n    printf(\"\\n==== ข้อมูลที่คุณใส่ ====\\n\");\n    printf(\"จำนวนเต็ม: %d\\n\", num);\n    printf(\"เลขทศนิยม: %.2f\\n\", decimal);\n    printf(\"ข้อความ: %s\\n\", text);\n\n    // ใช้ math library\n    printf(\"เลขยกกำลังสองของ %d คือ %.2f\\n\", num, pow(num, 2));\n\n    // ใช้ time\n    time_t now = time(NULL);\n    printf(\"เวลาปัจจุบัน (timestamp): %ld\\n\", now);\n\n    return 0;\n}\n",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "name": "การใช้ if else",
+    "description": "เงื่อนไขในภาษา C",
+    "examples": [
+      {
+        "code": "int x = 10;\nif (x > 5) {\n    printf(\"x มากกว่า 5\\n\");\n}\n",
+        "note": ""
+      },
+      {
+        "code": "int x = 3;\nif (x > 5) {\n    printf(\"x มากกว่า 5\\n\");\n} else {\n    printf(\"x ไม่มากกว่า 5\\n\");\n}\n",
+        "note": ""
+      },
+      {
+        "code": "int day = 3;\nswitch (day) {\n    case 1: printf(\"วันจันทร์\\n\"); break;\n    case 2: printf(\"วันอังคาร\\n\"); break;\n    case 3: printf(\"วันพุธ\\n\"); break;\n    default: printf(\"ไม่รู้จักวัน\\n\");\n}\n",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "name": "fgets(input, sizeof(input), stdin);",
+    "description": "สำหรับป้อนสตริงที่ไม่ชัวร์เรื่องความยาว",
+    "examples": [
+      {
+        "code": "char input[1000]; // กำหนด buffer ใหญ่พอสมควร\nprintf(\"ป้อนข้อความ: \");\n// อ่านสตริงจากผู้ใช้ผ่านทางแป้นพิมพ์ (stdin) แล้วเก็บไว้ในตัวแปร input\n// โดยจะอ่านได้สูงสุด sizeof(input) - 1 ตัวอักษร และจะหยุดเมื่อเจอ '\\n' หรือ EOF\nfgets(input, sizeof(input), stdin);\nprintf(\"คุณป้อน: %s\", input);\n",
+        "note": ""
+      },
+      {
+        "code": "fgets(input, sizeof(input), stdin);\ninput[strcspn(input, \"\\n\")] = '\\0';",
+        "note": "ใช้ลบ '\\n' ถ้ามีอยู่ สำหรับคำสั่ง fgets"
+      }
+    ]
+  },
+  {
+    "name": "เเปลงพิมพ์ใหญ่เป็นเล็ก",
+    "description": "",
+    "examples": [
+      {
+        "code": "int count[256] = {0}; //ดูตัวอย่างการใช้ค่าอาเรย์นี้ที่หัวข้อ \"การนับตัวอักษร\"\nfgets(input, sizeof(input), stdin);\ninput[strcspn(input, \"\\n\")] = '\\0';\n// วนลูปทีละตัวอักษรจากสตริง input จนกว่าจะเจอ '\\0' (จุดจบของสตริง)\nfor (int i = 0; input[i] != '\\0'; i++) {\n    // แปลงตัวอักษร input[i] ให้เป็นพิมพ์เล็ก แล้วเก็บไว้ใน lower[i]\n    // เพื่อให้การนับไม่สนใจว่าพิมพ์เล็กหรือใหญ่\n    lower[i] = tolower(input[i]);\n\n    // แปลง lower[i] เป็น unsigned char แล้วใช้เป็น index เพื่อเพิ่มค่าจำนวนนับในอาร์เรย์ count\n    // ซึ่งใช้เก็บจำนวนครั้งที่ตัวอักษรแต่ละตัว (ที่เป็นพิมพ์เล็ก) ปรากฏใน input\n    count[(unsigned char)lower[i]]++;\n}\n\n// เพิ่ม '\\0' ปิดท้ายสตริง lower เพื่อให้เป็นสตริงแบบ C ที่ถูกต้อง\nlower[strlen(input)] = '\\0';\n",
+        "note": "เลือกใช้ได้\ntolower() ใช้สำหรับแปลงเป็นพิมพ์เล็ก\ntoupper() ใช้สำหรับแปลงเป็นพิมพ์ใหญ่"
+      }
+    ]
+  },
+  {
+    "name": "การนับตัวอักษร",
+    "description": "ใช้โค้ดนี้เพื่อนับตัวอักษรเเต่ละตัวที่มีในประโยค\nโดยที่ \n*** count[256] คือการกำหนดขนาดของอาเรย์เป็น 256 ตัว (สามารถเก็บค่าตัวเลขจำนวนเต็ม 256 ตัว)\n*** {0} คือการกำหนดค่าเริ่มต้นให้กับอาเรย์ทั้งหมดเป็น 0\n*** โดยที่ count จะเก็บค่าจำนวนเต็ม 256 ตัว จากค่าเริ่มต้นที่เป็น 0 ทุกช่อง",
+    "examples": [
+      {
+        "code": "#include <stdio.h>\nint main() {\n    char input[] = \"Hello, World!\";\n    int count[256] = {0};  // กำหนดค่าเริ่มต้นเป็น 0\n    \n    // นับจำนวนการปรากฏของตัวอักษรใน input\n    for (int i = 0; input[i] != '\\0'; i++) {\n        count[(unsigned char)input[i]]++;  // เพิ่มค่าใน count ตามอักษรใน input\n    }\n\n    // แสดงผลลัพธ์การนับจำนวนการปรากฏของตัวอักษรแต่ละตัว\n    for (int i = 0; i < 256; i++) {\n        if (count[i] > 0) {\n            printf(\"Character '%c' appears %d times.\\n\", i, count[i]);\n        }\n    }\n\n    return 0;\n}\n",
+        "note": "256เพราะจะใช้ ASCII ตั้งเเต่ 0-255 เช่น ตัวที่ 1 เป็น H รหัส ASCII = 72 ในอาเรย์ count ช่อง 72 จะเก็บจำนวน\nตัวอักษร H ที่เจอ"
+      },
+      {
+        "code": "for (int i = 0; lower[i] != '\\0'; i++) {\n    if (count[(unsigned char)lower[i]] > 1) {\n        printf(\")\");\n    } else {\n        printf(\"(\");\n    }\n}\n",
+        "note": "โค้ดนี้มันจะนำเอาค่าความถี่ตัวอักษรที่พบไปลองใช้\nค่าใน lower[i] คืออักขระในสตริง lower ที่แปลงเป็นตัวพิมพ์เล็กแล้ว\ncount[(unsigned char)lower[i]] คือการใช้ค่า ASCII ของอักขระ (แปลงเป็น unsigned char) \nเป็นดัชนีในการเข้าถึงอาร์เรย์ count[] เพื่อดูว่าอักขระนั้นปรากฏบ่อยแค่ไหนในข้อความทั้งหมด\nที่มีการนับอยู่ใน count\n\nทำไมต้อง unsigned char\nในการกำหนดค่าตัวเเปร\nchar (default) เก็บค่าได้ ช่วง -128 ถึง 127\nunsigned char เก็บค่าได้ ช่วง 0 ถึง 255\nซึ่งค่าที่นำเข้ามายังเป็น char ดังนั้นถ้า ASCII ที่เกิน 127 บางค่าจะถูกตีเป็นลบ\nถ้าเอาตำเเหน่งติดลบไปใช้ array เช่น count[-10]) มันจะเข้าถึงหน่วยความจำผิด\nเลยต้องใช้ unsigned char ที่เป้ฯตัวแปรขนาด 1 ไบต์ที่ไม่มีลบ (0-255)"
+      }
+    ]
+  },
+  {
+    "name": "จำนวนเลขที่เคยเจอในเซต",
+    "description": "",
+    "examples": [
+      {
+        "code": "#include <stdio.h>\n\nint main() {\n    int num;\n    int found[10001] = {0}; // เเฟ็คสำหรับเลข 0-10000\n    int count = 0;\n\n    while (1) {\n        scanf(\"%d\", &num);\n\n        if (num == 0)\n            break;\n\n        if (!found[num]) {\n            found[num] = 1; // เจอครั้งแรก\n            count++;        // เพิ่มจำนวนสมาชิกเซต\n        }\n    }\n\n    printf(\"%d\\n\", count);\n\n    return 0;\n}\n",
+        "note": "อาร์เรย์แบบ Flag Array เพื่อเช็คว่าเลขนั้นเคยเจอมาก่อนหรือยัง\nเช่น ใช้ int found[10001] = {0}; เพื่อเก็บว่าเลข 0-10000 ว่าเคยเจอมั้ย"
+      }
+    ]
+  }
+]
