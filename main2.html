@@ -210,12 +210,7 @@
         padding: 15px;
         border: 1px solid #aaa;
         border-radius: 10px;
-        background-color: rgba(
-          255,
-          255,
-          255,
-          0.05
-        ); 
+        background-color: rgba(255, 255, 255, 0.05);
         box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
       }
 
@@ -252,8 +247,8 @@
       }
 
       textarea {
-        resize: none; 
-        overflow: hidden; 
+        resize: none;
+        overflow: hidden;
       }
     </style>
   </head>
@@ -543,14 +538,14 @@
               }
               
               ${
-  showAllNotes || ex.note.trim()
-    ? `<textarea 
+                showAllNotes || ex.note.trim()
+                  ? `<textarea 
         style="width: 97%; font-size: large; background-color: #fdf6e3; color: #000; padding: 6px; border-radius: 6px; border: 1px solid #ccc; text-decoration: none;" 
         placeholder="คำอธิบาย..." 
         oninput="editExample(${selectedIndex}, ${i}, 'note', this.value)"
       >${ex.note}</textarea>`
-    : ''
-}
+                  : ''
+              }
 
 
 
@@ -580,9 +575,8 @@
           });
         });
         setTimeout(() => {
-  document.querySelectorAll('textarea').forEach(autoResize);
-}, 0);
-
+          document.querySelectorAll('textarea').forEach(autoResize);
+        }, 0);
 
         Prism.highlightAll();
       }
@@ -658,7 +652,32 @@
       }
 
       function copyToClipboard(text) {
-        navigator.clipboard.writeText(text).then(() => alert('คัดลอกแล้ว!'));
+        if (navigator.clipboard && window.isSecureContext) {
+          // ใช้ Clipboard API ปกติ
+          navigator.clipboard
+            .writeText(text)
+            .then(() => {
+              alert('คัดลอกแล้ว!');
+            })
+            .catch((err) => {
+              alert('คัดลอกไม่สำเร็จ: ' + err);
+            });
+        } else {
+          // ใช้ fallback สำหรับ HTTP
+          const textarea = document.createElement('textarea');
+          textarea.value = text;
+          textarea.style.position = 'fixed'; // ป้องกัน scroll jump
+          document.body.appendChild(textarea);
+          textarea.focus();
+          textarea.select();
+          try {
+            document.execCommand('copy');
+            alert('คัดลอกแล้ว!');
+          } catch (err) {
+            alert('ไม่สามารถคัดลอกได้: ' + err);
+          }
+          document.body.removeChild(textarea);
+        }
       }
 
       document.getElementById('search').addEventListener('input', renderList);
